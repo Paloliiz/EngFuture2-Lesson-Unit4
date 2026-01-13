@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>F2 - Unit 4 : Connecting Ideas</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&family=Sarabun:wght@400;600&display=swap');
+        
+        :root {
+            /* สีธีมส้ม-เขียว สื่อถึงความกระตือรือร้นและการเรียนรู้ */
+            --primary: #00695c;
+            --accent: #e65100;
+            --bg: #e0f2f1;
+            --text: #333;
+        }
+
+        * { box-sizing: border-box; }
+
+        body { font-family: 'Prompt', sans-serif; background-color: var(--bg); margin: 0; padding: 20px; color: var(--text); min-height: 100vh; display: flex; justify-content: center; align-items: center; }
+        
+        .container { width: 100%; max-width: 650px; background: white; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); overflow: hidden; display: flex; flex-direction: column; min-height: 700px; position: relative; }
+        
+        /* Header */
+        .top-bar { padding: 15px 20px; background: var(--primary); color: white; display: flex; justify-content: space-between; align-items: center; }
+        .subject-name { font-size: 0.8em; opacity: 0.9; font-weight: 300; }
+        .user-display { font-size: 0.9em; font-weight: bold; background: rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 20px; }
+
+        /* Screens */
+        .screen { padding: 30px 20px; flex: 1; display: none; flex-direction: column; align-items: center; animation: fadeIn 0.4s ease-in-out; width: 100%; }
+        .screen.active { display: flex; }
+
+        /* Typography */
+        h2 { color: var(--primary); text-align: center; margin-bottom: 20px; font-size: 1.6em; }
+        p { line-height: 1.7; margin-bottom: 15px; width: 100%; }
+        
+        .content-box { width: 100%; background: #f5f5f5; padding: 25px; border-radius: 12px; margin-bottom: 20px; font-family: 'Sarabun', sans-serif; font-size: 1.1em; text-align: left; border-left: 6px solid var(--accent); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .highlight { background: #fff8e1; padding: 2px 6px; border-radius: 4px; font-weight: bold; color: #ef6c00; }
+        .instruction { font-size: 0.95em; color: #555; text-align: center; margin-bottom: 15px; font-style: italic; background: #e0f7fa; padding: 10px; border-radius: 8px; width: 100%; }
+
+        /* Inputs & Buttons */
+        input[type="number"] { padding: 15px; font-size: 1.3em; width: 80%; text-align: center; border: 2px solid #ddd; border-radius: 50px; margin: 20px 0; outline: none; font-family: 'Prompt', sans-serif; transition: 0.3s; }
+        input:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(0, 105, 92, 0.2); }
+
+        .btn { padding: 12px 30px; border: none; border-radius: 50px; font-size: 1.1em; font-weight: bold; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); font-family: 'Prompt', sans-serif; }
+        .btn-primary { background: linear-gradient(135deg, var(--primary), #004d40); color: white; width: 100%; max-width: 300px; }
+        .btn-primary:active { transform: scale(0.95); }
+        .btn-secondary { background: #e0e0e0; color: #555; }
+        .btn-nav-group { width: 100%; display: flex; justify-content: space-between; margin-top: auto; padding-top: 20px; }
+
+        /* Exercise: Fill Blank */
+        .sentence-box { font-size: 1.25em; text-align: center; margin: 15px 0; padding: 20px; background: white; border-radius: 10px; border: 2px solid #b2dfdb; color: #004d40; font-weight: bold; line-height: 1.8; }
+        .blank-space { display: inline-block; min-width: 80px; border-bottom: 3px solid var(--accent); color: var(--accent); padding: 0 5px; }
+        .choice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
+        .choice-btn { padding: 15px; border: 2px solid #ccc; background: white; border-radius: 10px; cursor: pointer; font-size: 1.1em; transition: 0.2s; font-weight: bold; color: #555; }
+        .choice-btn:hover { border-color: var(--primary); background: #e0f2f1; }
+        .choice-btn.selected { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* Game Sorting */
+        .sort-area { width: 100%; display: flex; flex-direction: column; gap: 12px; }
+        .sort-card { background: white; border: 2px solid #ddd; padding: 15px; border-radius: 10px; cursor: pointer; font-size: 1em; font-weight: 500; transition: 0.2s; display: flex; align-items: center; }
+        .sort-card:hover { border-color: var(--accent); transform: translateX(5px); }
+        .sort-card.picked { background: #cfd8dc; color: #78909c; cursor: default; border-color: #ccc; text-decoration: line-through; opacity: 0.6; }
+        .ans-slot { min-height: 100px; background: #fff3e0; border: 2px dashed var(--accent); border-radius: 10px; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--accent); padding: 15px; }
+        .ans-item { background: var(--accent); color: white; padding: 5px 15px; border-radius: 20px; margin: 5px; font-size: 0.9em; width: 90%; text-align: left; }
+
+        /* Quiz Choices */
+        .quiz-container { width: 100%; }
+        .quiz-progress { text-align: right; font-size: 0.9em; color: #888; margin-bottom: 10px; }
+        .quiz-option { width: 100%; padding: 18px; text-align: left; background: white; border: 2px solid #eee; border-radius: 15px; margin-bottom: 12px; cursor: pointer; transition: 0.2s; font-family: 'Sarabun', sans-serif; font-size: 1.1em; }
+        .quiz-option:hover { border-color: var(--primary); background: #e0f2f1; transform: translateY(-2px); }
+        .quiz-option.locked { pointer-events: none; opacity: 0.8; }
+        .quiz-option.correct { background: #a5d6a7; border-color: #388e3c; color: #1b5e20; }
+        .quiz-option.wrong { background: #ef9a9a; border-color: #d32f2f; color: #b71c1c; }
+
+        /* Certificate */
+        .cert-card { border: 10px double var(--primary); padding: 30px; margin-top: 10px; position: relative; background: #fff; width: 100%; text-align: center; overflow: hidden; }
+        .cert-title { font-size: 1.8em; color: var(--primary); font-weight: bold; margin: 15px 0; }
+        .cert-name { font-size: 1.6em; color: var(--accent); font-weight: bold; margin: 20px 0; border-bottom: 2px solid #eee; display: inline-block; padding-bottom: 10px; min-width: 200px; }
+        .cert-score { font-size: 3em; font-weight: bold; color: #333; }
+        .stamp { color: #c62828; border: 3px solid #c62828; display: inline-block; padding: 5px 20px; font-weight: bold; transform: rotate(-15deg); font-size: 1.5em; margin-top: 20px; opacity: 0.7; }
+        
+        /* Watermark */
+        .watermark-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; opacity: 0.05; display: flex; flex-wrap: wrap; justify-content: center; align-content: center; transform: rotate(-20deg) scale(1.2); }
+        .wm-item { margin: 30px; font-weight: bold; font-size: 16px; white-space: nowrap; color: #000; }
+        .cert-content { position: relative; z-index: 2; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="top-bar">
+        <div>
+            <div style="font-weight:bold; font-size:1.2em;">Connecting Ideas 🔥</div>
+            <div class="subject-name">ภาษาอังกฤษเพื่อการศึกษาต่อ 2 (อ30212)</div>
+        </div>
+        <div id="userDisplay" class="user-display">Guest</div>
+    </div>
+
+    <div id="screen-login" class="screen active">
+        <div style="text-align: center; margin: auto; width: 100%;">
+            <div style="font-size: 5em; margin-bottom: 10px;">🔗</div>
+            <h2>ห้องเรียนภาษาอังกฤษ</h2>
+            <p>Unit 4: Connecting Ideas</p>
+            <p style="font-size:0.9em; color:#e65100;">การเชื่อมโยงความคิด</p>
+            
+            <input type="number" id="inputID" placeholder="กรอกรหัสนักเรียน 5 หลัก" onkeypress="if(event.key === 'Enter') checkLogin()">
+            <br>
+            <button class="btn btn-primary" onclick="checkLogin()">เข้าสู่บทเรียน</button>
+            <p style="font-size: 0.8em; color: #999; margin-top: 30px;">(สำหรับ ม.6/3, 6/4)</p>
+            
+            <div style="margin-top: 30px; cursor: pointer; color: #e0e0e0; font-size: 0.8em;" onclick="adminReset()">
+                [ 🔄 Admin Reset ]
+            </div>
+        </div>
+    </div>
+
+    <div id="screen-lesson" class="screen">
+        <div id="lesson-content" style="width: 100%;"></div>
+    </div>
+
+    <div id="screen-result" class="screen"></div>
+</div>
+
+<script>
+    // --- 1. DATA: STUDENT DATABASE ---
+    const students = {
+        "012345": { name: "คุณครูศรุตา จันทเกตุ", class: "Teacher", no: 99 },
+        "11456": { name: "นายวุฒิชัย ปาสา", class: "ม.6/3", no: 1 }, "11478": { name: "นายเจษฎา นุขุนทด", class: "ม.6/3", no: 2 }, "11490": { name: "นายสิรวิชญ์ คณาญาติ", class: "ม.6/3", no: 3 }, "11513": { name: "นายธนวัฒน์ ตรวจนอก", class: "ม.6/3", no: 4 }, "11516": { name: "นายปรเวช ประหูศรี", class: "ม.6/3", no: 5 }, "11519": { name: "นายรัฐพงศ์ พรมประดิษฐ์", class: "ม.6/3", no: 6 }, "11520": { name: "นายวารสาร สายศร", class: "ม.6/3", no: 7 }, "11574": { name: "นายกนกนันธ์ อำคาหล้า", class: "ม.6/3", no: 8 }, "11575": { name: "นายกฤษฎา แกมจินดา", class: "ม.6/3", no: 9 }, "11578": { name: "นายณัฐพล ปุราถาเน", class: "ม.6/3", no: 10 }, "11588": { name: "นายภาสิต พงศกุล", class: "ม.6/3", no: 11 }, "11918": { name: "นายคชาพล ครองยุติ", class: "ม.6/3", no: 12 }, "12471": { name: "นายเขมินทร์ หลาบหนองแสง", class: "ม.6/3", no: 13 }, "12472": { name: "นายณัฐวัฒน์ ด่านมณี", class: "ม.6/3", no: 14 }, "12775": { name: "นายสมเจตน์ พุทธสังข์", class: "ม.6/3", no: 16 }, "11493": { name: "นางสาวแก้วมณี ฉัตรแสนทวีสุข", class: "ม.6/3", no: 17 }, "11499": { name: "นางสาวพัชรพร ดารักษ์", class: "ม.6/3", no: 18 }, "11501": { name: "นางสาวเพ็ญพิชชา สีทอง", class: "ม.6/3", no: 19 }, "11533": { name: "นางสาวยุพารัตน์ สีแดง", class: "ม.6/3", no: 20 }, "11596": { name: "นางสาวทิพวรรณ บุญคุ่ย", class: "ม.6/3", no: 21 }, "11628": { name: "นางสาวกมลเนตร ฤทธิเดช", class: "ม.6/3", no: 22 }, "11632": { name: "นางสาวทิพรัตน์ ร่มรื่น", class: "ม.6/3", no: 23 }, "12473": { name: "นางสาวชนาภา นาชัยภูมิ", class: "ม.6/3", no: 24 }, "12474": { name: "นางสาวณัฐวิภา จันสำรวม", class: "ม.6/3", no: 25 }, "12476": { name: "นางสาววรัญญามะลิซ้อน", class: "ม.6/3", no: 26 },
+        "11484": { name: "นายธีรติ ประหูศรี", class: "ม.6/4", no: 1 }, "11518": { name: "นายภูมิพัฒณ์ สีนวล", class: "ม.6/4", no: 2 }, "11523": { name: "นายอนันต์ชัย พันชำนาญ", class: "ม.6/4", no: 3 }, "11582": { name: "นายนิคม ตราผักแว่น", class: "ม.6/4", no: 4 }, "11618": { name: "นายพีรพัฒน์ ไก่แก้ว", class: "ม.6/4", no: 5 }, "11624": { name: "นายอธิชา พลจอหอ", class: "ม.6/4", no: 6 }, "11674": { name: "นายรัตภูมิ แก่งกระโทก", class: "ม.6/4", no: 7 }, "11957": { name: "นายนิพิฐพนท์ ดาศรี", class: "ม.6/4", no: 8 }, "12228": { name: "นายภูริพัทธ์ เปี่ยมเจริญ", class: "ม.6/4", no: 9 }, "12479": { name: "นายทิฐินันท์ จาดนอก", class: "ม.6/4", no: 10 }, "12480": { name: "นายสุทธินนท์ สุทธิเดช", class: "ม.6/4", no: 11 }, "11465": { name: "นางสาวภัทรภรณ์ นาควัน", class: "ม.6/4", no: 12 }, "11505": { name: "นางสาววิยะฎา อุตรี", class: "ม.6/4", no: 13 }, "11538": { name: "นางสาววีระตา สืบสุนทร", class: "ม.6/4", no: 14 }, "11567": { name: "นางสาวสลิลทิพย์ เจริญดง", class: "ม.6/4", no: 15 }, "11568": { name: "นางสาวสุชาดา อนันต์นิล", class: "ม.6/4", no: 16 }, "11569": { name: "นางสาวสุพิชฌาย์ กำเหนิด", class: "ม.6/4", no: 17 }, "11593": { name: "นางสาวกมลรัตน์ พืชนะผล", class: "ม.6/4", no: 18 }, "11604": { name: "นางสาวอรวินท์ สุดสังข์", class: "ม.6/4", no: 19 }, "11671": { name: "นางสาวอิมวา แสนขวา", class: "ม.6/4", no: 20 }, "11949": { name: "นางสาวภัทรณนิดา กุลชัย", class: "ม.6/4", no: 21 }, "12481": { name: "นางสาวรุ้งลาวัลย์ สายสังข์", class: "ม.6/4", no: 22 }, "12488": { name: "นางสาวธัญรัตน์ แตงรอด", class: "ม.6/4", no: 23 }, "12778": { name: "นางสาวอภิญญา งามสม", class: "ม.6/4", no: 24 }
+    };
+
+    let currentUser = null;
+    let slideIndex = 0;
+    let quizScore = 0;
+    let currentQuizSet = []; 
+
+    // --- EXPANDED QUESTION BANK (30 Items) ---
+    const questionPool = [
+        { q: "คำเชื่อม (Transition Words) มีหน้าที่อะไร?", choices: ["ทำให้ประโยคสั้นลง", "เชื่อมโยงให้ประโยคลื่นไหล", "บอกเวลาเท่านั้น"], ans: "เชื่อมโยงให้ประโยคลื่นไหล" },
+        { q: "ถ้าต้องการเชื่อมสิ่งที่ 'เหมือนกัน' ควรใช้คำว่า?", choices: ["But", "Because", "And"], ans: "And" },
+        { q: "ถ้าต้องการเชื่อมสิ่งที่ 'ขัดแย้งกัน' ควรใช้คำว่า?", choices: ["And", "So", "But"], ans: "But" },
+        { q: "'I like pizza, ___ I don't like burgers.'", choices: ["and", "but", "so"], ans: "but" },
+        { q: "คำว่า 'Because' ใช้นำหน้าสิ่งใด?", choices: ["ผลลัพธ์ (Effect)", "เหตุผล (Cause)", "ลำดับ (Sequence)"], ans: "เหตุผล (Cause)" },
+        { q: "คำว่า 'So' ใช้นำหน้าสิ่งใด?", choices: ["ผลลัพธ์ (Effect)", "เหตุผล (Cause)", "การขัดแย้ง"], ans: "ผลลัพธ์ (Effect)" },
+        { q: "'It was raining, ___ I stayed home.'", choices: ["because", "so", "but"], ans: "so" },
+        { q: "'I stayed home ___ it was raining.'", choices: ["so", "because", "and"], ans: "because" },
+        { q: "หากต้องการลำดับเหตุการณ์เป็นขั้นตอน คำแรกที่ใช้คือ?", choices: ["Finally", "Next", "First"], ans: "First" },
+        { q: "คำว่า 'Finally' มักจะใช้อยู่ส่วนไหนของเรื่อง?", choices: ["ตอนต้น", "ตรงกลาง", "ตอนท้ายสุด"], ans: "ตอนท้ายสุด" },
+        { q: "'Next' และ 'Then' ใช้เพื่อบอกอะไร?", choices: ["ลำดับเหตุการณ์ถัดไป", "เหตุผล", "ความขัดแย้ง"], ans: "ลำดับเหตุการณ์ถัดไป" },
+        { q: "'She is beautiful ___ smart.'", choices: ["but", "and", "so"], ans: "and" },
+        { q: "'I studied hard, ___ I passed the exam.'", choices: ["so", "because", "but"], ans: "so" },
+        { q: "'I passed the exam ___ I studied hard.'", choices: ["so", "but", "because"], ans: "because" },
+        { q: "'He is rich, ___ he is unhappy.'", choices: ["and", "but", "so"], ans: "but" },
+        { q: "ข้อใดเป็นคำเชื่อมบอก 'เหตุและผล'?", choices: ["First, Next", "And, But", "Because, So"], ans: "Because, So" },
+        { q: "ข้อใดเป็นคำเชื่อมบอก 'ลำดับเหตุการณ์'?", choices: ["First, Then, Finally", "And, But, Or", "Because, So"], ans: "First, Then, Finally" },
+        { q: "'I want to buy a car, ___ I have no money.'", choices: ["so", "because", "but"], ans: "but" },
+        { q: "'First, wash vegetables. ___, cut them.'", choices: ["Finally", "Next", "Because"], ans: "Next" },
+        { q: "ประโยคในข้อใดใช้คำเชื่อม *ผิด*?", choices: ["I like dogs and cats.", "It was hot, so I opened the window.", "I was hungry because I ate a lot."], ans: "I was hungry because I ate a lot." },
+        { q: "'He woke up late, ___ he missed the bus.'", choices: ["so", "because", "but"], ans: "so" },
+        { q: "'I can play guitar, ___ I cannot sing.'", choices: ["and", "but", "or"], ans: "but" },
+        { q: "'She likes coffee ___ cake.'", choices: ["and", "but", "so"], ans: "and" },
+        { q: "คำว่า 'Consequently' มีความหมายคล้ายกับ?", choices: ["So", "But", "And"], ans: "So" },
+        { q: "คำว่า 'However' มีความหมายคล้ายกับ?", choices: ["And", "But", "Because"], ans: "But" },
+        { q: "'The weather was bad, ___ we cancelled the trip.'", choices: ["because", "so", "but"], ans: "so" },
+        { q: "'We cancelled the trip ___ the weather was bad.'", choices: ["because", "so", "but"], ans: "because" },
+        { q: "ข้อใด *ไม่ใช่* คำเชื่อมลำดับเวลา?", choices: ["Then", "After that", "Because"], ans: "Because" },
+        { q: "ประโยค 'I love you, but I can't marry you.' เป็นความสัมพันธ์แบบใด?", choices: ["คล้อยตาม", "ขัดแย้ง", "เหตุผล"], ans: "ขัดแย้ง" },
+        { q: "ประโยค 'He didn't eat because he wasn't hungry.' เป็นความสัมพันธ์แบบใด?", choices: ["ขัดแย้ง", "เหตุผล", "ลำดับเวลา"], ans: "เหตุผล" }
+    ];
+
+    // --- BASE SLIDES (Unit 4 Intensive) ---
+    const baseSlides = [
+        // 0. Intro
+        { type: "intro", title: "Unit 4: Connecting Ideas", html: `<p><b>ยินดีต้อนรับสู่บทเรียนแบบเข้มข้น! (Intensive Edition)</b></p><ul><li>เรียนรู้การเชื่อมประโยค (Transition Words)</li><li>เข้าใจและใช้คำเชื่อมพื้นฐาน 4 ประเภท (คล้อยตาม, ขัดแย้ง, เหตุผล, ลำดับ)</li><li>สามารถเชื่อมโยงประโยคง่ายๆ ได้</li></ul><p>ตั้งใจทำนะคะ ครูเอาใจช่วย!</p>` },
+        
+        // Theory Sections
+        { type: "read", title: "1. Addition (การคล้อยตาม)", html: `<p class="highlight" style="background:#e8f5e9; color:#2e7d32;">And (และ)</p><p>ใช้เชื่อมสิ่งที่ <b>เหมือนกัน</b> หรือไปในทางเดียวกัน</p><div class="content-box">Ex: I like English <b>and</b> I like Math.<br>(ฉันชอบอังกฤษ และ ฉันชอบคณิต)</div>` },
+        { type: "read", title: "2. Contrast (การขัดแย้ง)", html: `<p class="highlight" style="background:#ffebee; color:#c62828;">But (แต่)</p><p>ใช้เชื่อมสิ่งที่ <b>ตรงข้ามกัน</b> หรือไม่เหมือนกัน</p><div class="content-box">Ex: I like English, <b>but</b> I don't like Math.<br>(ฉันชอบอังกฤษ แต่ ฉันไม่ชอบคณิต)</div>` },
+        { type: "read", title: "3. Cause & Effect (เหตุและผล)", html: `<p class="highlight" style="background:#e3f2fd; color:#1565c0;">Because (เพราะว่า) & So (ดังนั้น)</p><p>👉 <b>Because</b> นำหน้า "เหตุผล" (Cause)<br><i>[ผล] because [เหตุ]</i></p><p>👉 <b>So</b> นำหน้า "ผลลัพธ์" (Effect)<br><i>[เหตุ] , so [ผล]</i></p><div class="content-box">Ex 1: I was late <b>because</b> the traffic was bad.<br>Ex 2: The traffic was bad, <b>so</b> I was late.</div>` },
+        { type: "read", title: "4. Sequence (การลำดับ)", html: `<p>ใช้เมื่อเล่าเรื่องเป็นขั้นตอน</p><ul><li><b>First, ...</b> (อันดับแรก)</li><li><b>Next, / Then, ...</b> (ต่อมา)</li><li><b>Finally, ...</b> (สุดท้ายนี้)</li></ul><div class="content-box">Ex: <b>First</b>, fill the form. <b>Next</b>, pay money. <b>Finally</b>, get card.</div>` },
+
+        // --- CONCEPT CHECK (Pre-test knowledge) ---
+        // แก้ไข: เปลี่ยนจาก choices เป็น options เพื่อให้ตรงกับโค้ด initQuiz
+        { type: "quiz", title: "Concept Check 1/3", q: "ถ้าประโยคข้างหน้ากับข้างหลัง 'ขัดแย้งกัน' ต้องใช้คำว่า?", options: ["And", "But", "So"], ans: 1 },
+        { type: "quiz", title: "Concept Check 2/3", q: "คำว่า 'So' (ดังนั้น) ใช้นำหน้าสิ่งใด?", options: ["เหตุผล (Cause)", "ผลลัพธ์ (Effect)", "ตัวอย่าง (Example)"], ans: 1 },
+        { type: "quiz", title: "Concept Check 3/3", q: "ถ้าจะเริ่มเล่าขั้นตอนแรก ควรใช้คำว่า?", options: ["Finally", "Then", "First"], ans: 2 },
+
+        // --- EXERCISE 5: Part 1 (4 Items) ---
+        { type: "fill-blank", id: 1, title: "Exercise", 
+          pre: "Maria loves coffee, ", post: " her sister loves tea. (ขัดแย้ง)", 
+          choices: ["and", "but", "so", "because"], ans: "but" },
+        { type: "fill-blank", id: 2, title: "Exercise", 
+          pre: "I want to go to the library ", post: " I need to study. (เหตุผล)", 
+          choices: ["so", "but", "because", "and"], ans: "because" },
+        { type: "fill-blank", id: 3, title: "Exercise", 
+          pre: "He studied very hard, ", post: " he passed the exam. (ผลลัพธ์)", 
+          choices: ["because", "but", "so", "and"], ans: "so" },
+        { type: "fill-blank", id: 4, title: "Exercise", 
+          pre: "My major is interesting ", post: " difficult. (คล้อยตาม/เสริม)", 
+          choices: ["so", "because", "but", "and"], ans: "and" },
+
+        // --- EXERCISE 5: Part 2 (New 4 Items) ---
+        { type: "fill-blank", id: 5, title: "Exercise", 
+          pre: "It was raining heavily, ", post: " we stayed inside.", 
+          choices: ["but", "so", "because", "or"], ans: "so" },
+        { type: "fill-blank", id: 6, title: "Exercise", 
+          pre: "She didn't eat lunch ", post: " she wasn't hungry.", 
+          choices: ["so", "because", "but", "and"], ans: "because" },
+        { type: "fill-blank", id: 7, title: "Exercise", 
+          pre: "Tom is tall, ", post: " his brother is short.", 
+          choices: ["and", "but", "so", "because"], ans: "but" },
+        { type: "fill-blank", id: 8, title: "Exercise", 
+          pre: "First, wash your hands. ", post: ", dry them.", 
+          choices: ["Next", "Because", "But", "So"], ans: "Next" },
+
+        // Game Intro
+        { type: "read", title: "Activity : How to make instant noodles", html: `<p><b>ภารกิจ:</b> เรียงลำดับขั้นตอนการต้มบะหมี่กึ่งสำเร็จรูปให้ถูกต้อง</p><p>ใช้คำเชื่อม: First, Next, Then, Finally</p>` },
+
+        // Game (Sorting)
+        { type: "game", title: "Instant Noodle Challenge 🍜", items: [
+            {id: '1', txt: "First, boil the water."},
+            {id: '2', txt: "Next, put the noodles in the bowl."},
+            {id: '3', txt: "Then, add hot water and wait 3 mins."},
+            {id: '4', txt: "Finally, enjoy your noodles."}
+        ], answer: ['1', '2', '3', '4'] },
+
+        // Quiz Intro
+        { type: "quiz-intro", title: "Final Challenge Quiz", html: `<div style="text-align:center; font-size:3em;">😈</div><p><b>แบบทดสอบวัดผล (10 ข้อ)</b></p><p></p><p class="highlight" style="color:#c62828; background:#ffebee;"><b>เกณฑ์ผ่าน: ต้องได้คะแนนเต็ม 10/10 เท่านั้น!</b></p>` }
+    ];
+
+    let currentSessionSlides = []; 
+
+    // --- UTILS ---
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    function generateQuizSet() {
+        const shuffledPool = shuffleArray([...questionPool]);
+        const selectedQuestions = shuffledPool.slice(0, 10);
+        const quizSlides = selectedQuestions.map(qObj => {
+            let opts = [...qObj.choices];
+            opts = shuffleArray(opts);
+            const correctIdx = opts.indexOf(qObj.ans);
+            return {
+                type: "quiz",
+                q: qObj.q,
+                options: opts,
+                ans: correctIdx
+            };
+        });
+        return quizSlides;
+    }
+
+    // --- LOGIC ---
+
+    function checkLogin() {
+        const id = document.getElementById('inputID').value.trim();
+        
+        // Admin Reset (Paloliiz in Base64)
+        const targetSecret = "UGFsb2xpaXo="; 
+        
+        if (students[id]) {
+            currentUser = students[id];
+            currentUser.id = id;
+            document.getElementById('userDisplay').innerText = currentUser.name;
+            document.getElementById('screen-login').classList.remove('active');
+            
+            // Prepare Slides
+            const randomQuizzes = generateQuizSet();
+            currentSessionSlides = [...baseSlides, ...randomQuizzes];
+            slideIndex = 0;
+            
+            renderSlide();
+        } else {
+            alert("ไม่พบรหัสนักเรียนค่ะ (กรุณากรอกเฉพาะตัวเลข)");
+        }
+    }
+
+    function renderSlide() {
+        document.getElementById('screen-lesson').innerHTML = ""; 
+        document.getElementById('screen-lesson').style.display = "none";
+        document.getElementById('screen-result').innerHTML = ""; 
+        document.getElementById('screen-result').style.display = "none";
+
+        if (slideIndex >= currentSessionSlides.length) {
+            showResult();
+            return;
+        }
+
+        const s = currentSessionSlides[slideIndex];
+        const screen = document.getElementById('screen-lesson');
+        screen.style.display = "flex"; 
+        screen.classList.add('active');
+
+        // Reset Score if starting FINAL quiz (Concept checks don't count towards final score)
+        if (s.type === 'quiz-intro') quizScore = 0;
+
+        let html = `<h2>${s.title || "Question " + (slideIndex - baseSlides.length + 1)}</h2>`;
+
+        // Render based on type
+        if (['intro', 'read', 'quiz-intro'].includes(s.type)) {
+            html += `<div class="content-box">${s.html}</div>`;
+            html += renderNav(true);
+        }
+        else if (s.type === 'fill-blank') {
+            html += `<p class="instruction">เลือกคำเชื่อมที่ถูกต้องเติมลงในช่องว่าง</p>`;
+            html += `<div class="sentence-box">${s.pre}<span id="blank-slot-${s.id}" class="blank-space">_______</span>${s.post}</div>`;
+            html += `<div class="choice-grid" id="choice-area"></div>`;
+            html += `<button class="btn btn-primary" style="margin-top:20px;" onclick="checkFillBlank('${s.ans}', ${s.id})">ตรวจคำตอบ</button>`;
+        }
+        else if (s.type === 'game') {
+            html += `<p class="instruction">แตะที่ข้อความเพื่อเรียงลำดับขั้นตอน (1 ➜ 4)</p>`;
+            html += `<div class="ans-slot" id="game-slot"><span style="color:#ccc;">(รายการที่เลือกจะปรากฏที่นี่)</span></div>`;
+            html += `<div class="sort-area" id="sort-area"></div>`;
+            html += `<div class="btn-nav-group"><button class="btn btn-secondary" onclick="resetGame()">ล้างลำดับ</button><button class="btn btn-primary" onclick="checkGame()">ส่งคำตอบ</button></div>`;
+        }
+        else if (s.type === 'quiz') {
+            html += `<div class="quiz-container">
+                        ${s.title ? '' : `<div class="quiz-progress">ข้อที่ ${slideIndex - baseSlides.length + 1} / 10</div>`}
+                        <div class="content-box" style="font-weight:bold; font-size:1.2em;">${s.q}</div>
+                        <div id="quiz-options"></div>
+                     </div>`;
+        }
+
+        screen.innerHTML = `<div style="width:100%;">${html}</div>`;
+
+        if (s.type === 'fill-blank') initFillBlank(s);
+        if (s.type === 'game') initGame(s);
+        if (s.type === 'quiz') initQuiz(s);
+    }
+
+    function renderNav(showBack) {
+        let backBtn = (showBack && slideIndex > 0) ? `<button class="btn btn-secondary" onclick="prevSlide()">⬅️ ย้อนกลับ</button>` : `<div></div>`;
+        return `<div class="btn-nav-group">${backBtn}<button class="btn btn-primary" style="width:auto;" onclick="nextSlide()">ไปต่อ ➡️</button></div>`;
+    }
+
+    function nextSlide() { slideIndex++; renderSlide(); }
+    function prevSlide() { slideIndex--; renderSlide(); }
+
+    // --- FILL BLANK LOGIC ---
+    let selectedChoice = null;
+    function initFillBlank(s) {
+        selectedChoice = null;
+        const area = document.getElementById('choice-area');
+        s.choices.forEach(txt => {
+            let btn = document.createElement('div');
+            btn.className = 'choice-btn';
+            btn.innerText = txt;
+            btn.onclick = () => selectFillChoice(txt, btn, s.id);
+            area.appendChild(btn);
+        });
+    }
+
+    function selectFillChoice(txt, btn, id) {
+        selectedChoice = txt;
+        document.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        document.getElementById(`blank-slot-${id}`).innerText = txt;
+        document.getElementById(`blank-slot-${id}`).style.color = "var(--primary)";
+    }
+
+    function checkFillBlank(ans, id) {
+        if (!selectedChoice) { alert("กรุณาเลือกคำตอบก่อนค่ะ"); return; }
+        if (selectedChoice === ans) {
+            alert("🎉 ถูกต้องค่ะ!");
+            nextSlide();
+        } else {
+            alert("❌ ยังไม่ใช่นะคะ ลองใหม่อีกครั้ง");
+            selectedChoice = null;
+            document.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('selected'));
+            document.getElementById(`blank-slot-${id}`).innerText = "_______";
+        }
+    }
+
+    // --- GAME LOGIC ---
+    let gamePicks = [];
+    function initGame(s) {
+        gamePicks = [];
+        const area = document.getElementById('sort-area');
+        s.items.forEach(item => {
+            let div = document.createElement('div');
+            div.className = 'sort-card';
+            div.innerText = item.txt;
+            div.onclick = () => pickGameItem(item.id, div, item.txt);
+            area.appendChild(div);
+        });
+    }
+    function pickGameItem(id, el, txt) {
+        if (gamePicks.includes(id)) return;
+        gamePicks.push(id);
+        el.classList.add('picked');
+        
+        const slot = document.getElementById('game-slot');
+        if (gamePicks.length === 1) slot.innerHTML = "";
+        
+        let itemDiv = document.createElement('div');
+        itemDiv.className = 'ans-item';
+        itemDiv.innerText = `${gamePicks.length}. ${txt}`;
+        slot.appendChild(itemDiv);
+    }
+    function resetGame() { gamePicks = []; renderSlide(); }
+    function checkGame() {
+        const s = currentSessionSlides[slideIndex];
+        if (JSON.stringify(gamePicks) === JSON.stringify(s.answer)) { alert("🎉 ถูกต้องค่ะ! เก่งมาก"); nextSlide(); }
+        else { alert("❌ ลำดับยังไม่ถูกต้องค่ะ ลองใหม่อีกครั้งนะ"); resetGame(); }
+    }
+
+    // --- QUIZ LOGIC ---
+    function initQuiz(s) {
+        const area = document.getElementById('quiz-options');
+        s.options.forEach((opt, idx) => {
+            let btn = document.createElement('button');
+            btn.className = 'quiz-option';
+            btn.innerText = opt;
+            btn.onclick = () => answerQuiz(btn, idx, s.ans, s.title);
+            area.appendChild(btn);
+        });
+    }
+
+    function answerQuiz(btn, selected, correct, isPractice) {
+        const allBtns = document.querySelectorAll('.quiz-option');
+        allBtns.forEach(b => b.classList.add('locked')); 
+
+        if (selected === correct) {
+            btn.classList.add('correct');
+            // Only count score if it's NOT a practice question (no title)
+            if (!isPractice) quizScore++;
+            setTimeout(() => { 
+                if(isPractice) alert("ถูกต้องค่ะ! เก่งมาก"); // Feedback for practice
+                nextSlide(); 
+            }, 500); 
+        } else {
+            btn.classList.add('wrong');
+            allBtns[correct].classList.add('correct'); 
+            setTimeout(() => {
+                if(isPractice) alert("ผิดค่ะ คำตอบที่ถูกคือสีเขียวนะคะ"); // Feedback for practice
+                nextSlide(); 
+            }, 1500); 
+        }
+    }
+
+    // --- RESULT ---
+    function showResult() {
+        document.getElementById('screen-lesson').style.display = "none";
+        const resScreen = document.getElementById('screen-result');
+        resScreen.style.display = "flex";
+        
+        const passed = (quizScore === 10);
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+        const timeStr = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+        const refCode = "U4-" + Math.random().toString(36).substr(2, 6).toUpperCase();
+
+        if (passed) {
+            resScreen.innerHTML = `
+                <h2 style="color:var(--primary)">Mission Complete!</h2>
+                <div class="cert-card">
+                    <div class="watermark-container" id="wm-area"></div>
+                    <div class="cert-content">
+                        <div style="font-size:0.8em; letter-spacing:2px; color:#666;">CERTIFICATE OF COMPLETION</div>
+                        <h3 class="cert-title">Connecting Ideas Master</h3>
+                        <p>มอบให้แก่</p>
+                        <div class="cert-name">${currentUser.name}</div>
+                        <p>${currentUser.class} | เลขที่ ${currentUser.no}</p>
+                        <div class="cert-score">10/10</div>
+                        <p style="color:green; font-weight:bold;">FULL SCORE</p>
+                        <div style="margin-top:20px; font-size:0.8em; color:#777; border-top:1px dashed #ccc; padding-top:10px;">
+                            วันที่: ${dateStr} เวลา ${timeStr}<br>Ref: ${refCode}
+                        </div>
+                    </div>
+                </div>
+                <p style="margin-top:20px; color:#666; font-size:0.9em;">📸 แคปหน้าจอนี้ส่งครูได้เลยค่ะ</p>
+                <button class="btn btn-secondary" onclick="location.reload()" style="margin-top:15px;">ออกจากระบบ</button>
+            `;
+            
+            const wm = document.getElementById('wm-area');
+            const txt = `${currentUser.id} ${currentUser.name}`;
+            for(let i=0; i<15; i++) {
+                let s = document.createElement('div');
+                s.className = 'wm-item';
+                s.innerText = txt;
+                wm.appendChild(s);
+            }
+        } else {
+            resScreen.innerHTML = `
+                <div class="mission-fail" style="width:100%;">
+                    <div style="font-size:4em;">😢</div>
+                    <h2 style="color:#c62828;">Mission Failed</h2>
+                    <p style="font-size:1.4em; font-weight:bold;">คุณทำได้ ${quizScore}/10 คะแนน</p>
+                    <p>เกณฑ์ผ่าน: 10/10 คะแนนเต็มเท่านั้น</p>
+                    <p style="color:#666; font-size:0.9em;">สู้ๆ นะคะ ระบบสุ่มโจทย์ใหม่ให้แล้ว ลองอีกครั้ง!</p>
+                    <button class="btn btn-primary" onclick="restartQuiz()">↺ เริ่มทำแบบทดสอบใหม่</button>
+                </div>
+            `;
+        }
+    }
+
+    function restartQuiz() {
+        quizScore = 0;
+        const newQuizzes = generateQuizSet();
+        currentSessionSlides = [...baseSlides, ...newQuizzes];
+        slideIndex = baseSlides.length - 1; // Jump to Quiz Intro (Last slide of base)
+        renderSlide();
+    }
+
+    // --- ADMIN RESET ---
+    function adminReset() {
+        const targetSecret = "UGFsb2xpaXo="; // Paloliiz in Base64
+        let input = prompt("🔐 Admin Reset (ใส่รหัสลับ):");
+        try {
+            if (input && btoa(input) === targetSecret) {
+                localStorage.clear();
+                alert("✅ รีเซ็ตระบบเรียบร้อยค่ะ");
+                location.reload();
+            } else if (input) {
+                alert("❌ รหัสไม่ถูกต้องค่ะ");
+            }
+        } catch(e) { alert("❌ รหัสไม่ถูกต้องค่ะ"); }
+    }
+
+</script>
+
+</body>
+</html>
